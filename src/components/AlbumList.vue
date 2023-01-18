@@ -2,6 +2,7 @@
   import { defineComponent, ref } from "vue";
   import axios from 'axios';
   import Album from '../components/Album.vue';
+  const ITUNES_API_URL = 'https://itunes.apple.com/us/rss/topalbums/limit=100/json';
 
   interface Album {
     id: number,
@@ -14,6 +15,15 @@
     sortByArtist: void,
     sortByTitle: void,
     sortByRating: void
+  }
+
+  interface ItunesEntry {
+    "im:name": EntryObj,
+    "im:artist": EntryObj
+  }
+
+  interface EntryObj {
+    label: string
   }
 
   export default defineComponent({
@@ -52,8 +62,8 @@
   async function getItunesData() {
     try {
       const itunesRequest = await axios.get(
-        'https://itunes.apple.com/us/rss/topalbums/limit=100/json'
-      )
+        ITUNES_API_URL
+      );
       return itunesRequest.data;
     } catch (error) {
       console.log('error retrieving itunes data', error);
@@ -65,7 +75,7 @@
   async function createAlbumList() {
     const itunesData = await getItunesData();
     const entries = itunesData.feed.entry;
-    return entries.map((entry, index) => {
+    return entries.map((entry: ItunesEntry, index: Number) => {
       return {
         id: index,
         title: entry["im:name"].label,
@@ -87,7 +97,8 @@
     </div>
     <br/>
     <Album
-      v-for="album in albums"
+      v-for="album, index in albums"
+      v-bind:id="index"
       v-bind:title="album.title"
       v-bind:artist="album.artist"
     ></Album>

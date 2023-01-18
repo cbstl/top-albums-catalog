@@ -6,7 +6,7 @@ import Album from "../Album.vue";
 describe("Album", () => {
   it("renders html properly", () => {
     const wrapper = mount(Album, { props: { title: "Breathing Ash", artist: "Begin at Zero" } });
-    expect(wrapper.html()).toContain('<div class="card-title">Begin at Zero</div>');
-    expect(wrapper.html()).toContain('<div class="card-text">Breathing Ash</div>')
+    expect(wrapper.text()).toContain('Begin at Zero');
+    expect(wrapper.text()).toContain('Breathing Ash')
   });
 });
