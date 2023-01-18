@@ -12,6 +12,7 @@
 
   interface AlbumListSetup {
     albums: Album[],
+    searchTerm: string,
     sortByArtist: void,
     sortByTitle: void,
     sortByRating: void
@@ -30,9 +31,26 @@
     components: {
       Album
     },
-    async setup() {
-      // initialize list of albums to iterate over
+    props: {
+      searchTerm: String
+    },
+    async setup(props) {
+      // initialize data
       const albums = ref(await createAlbumList()) as Array<Album>;
+      const searchTerm = props.searchTerm;
+
+      // search for artist or album
+      const searchForTerm = async function (this: AlbumListSetup, theSearchTerm: string) {
+        if (!theSearchTerm) {
+          this.albums = await createAlbumList();
+        } else {
+          const upperSearchTerm = theSearchTerm.toUpperCase();
+          this.albums = this.albums.filter(album => 
+            album.artist.toUpperCase().includes(upperSearchTerm)
+            || album.title.toUpperCase().includes(upperSearchTerm)
+          );
+        }
+      }
 
       // orders albums by artist alphabetically
       const sortByArtist = function (this: AlbumListSetup) {
@@ -54,7 +72,8 @@
           return a1.id < a2.id ? -1 : 1;
         })
       }
-      return { albums, sortByArtist, sortByTitle, sortByRating }
+
+      return { albums, searchTerm, searchForTerm, sortByArtist, sortByTitle, sortByRating }
     }
   })
 
@@ -87,13 +106,30 @@
 
 <template>
   <main>
-    <div id="sort-buttons">
-      <p>Here are today's top 100 iTunes albums! Feel free to <i>sort</i> through them :)</p>
+    <div id="navigation">
+      <p>Here are today's top {{albums.length}} iTunes albums! Feel free to <i>sort</i> through them :)</p>
       <div class="btn-group">
         <button @click="sortByArtist" type="button" class="btn btn-success btn-rounded">Sort by Artist A-Z</button>
         <button @click="sortByTitle" type="button" class="btn btn-success btn-rounded">Sort by Title A-Z</button>
         <button @click="sortByRating" type="button" class="btn btn-success btn-rounded">Sort by Rating</button>
       </div>
+      <br/><br/>
+      <div class="input-group">
+          <div class="form-outline">
+            <table>
+            <tr>
+              <td>
+                <input v-model="searchTerm" type="search" placeholder="Search artist or title" id="search-input" class="form-control" />
+              </td>
+              <td>
+                <button @click="searchForTerm(searchTerm)" type="button" id="search-button" class="btn btn-primary">
+                  <i class="fas fa-search"></i>
+                </button>
+              </td>
+            </tr>
+            </table>
+          </div>
+        </div>
     </div>
     <br/>
     <Album
@@ -106,7 +142,13 @@
 </template>
 
 <style scoped>
-#sort-buttons {
+#navigation {
   text-align: center;
+}
+
+.form-outline {
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>

@@ -6,6 +6,7 @@ import { RouterView } from "vue-router";
   <header>
     <h1>DJ Japan Rabbit</h1>
   </header>
+  <br/>
   <Suspense>
     <template #default>
     <RouterView />
