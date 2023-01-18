@@ -1,4 +1,9 @@
 <script setup lang="ts">
+    export interface Album {
+        id: number,
+        title: string,
+        artist: string
+    }
     defineProps<{
         title: string;
         artist: string;
