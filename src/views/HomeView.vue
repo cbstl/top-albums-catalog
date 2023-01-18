@@ -1,9 +1,7 @@
 <script setup lang="ts">
+  import { computed } from 'vue';
   import Album from '../components/Album.vue';
   import axios from 'axios'
-  import { request } from 'http';
-
-  let itunesError = null;
 
   async function getItunesData() {
     try {
@@ -13,17 +11,25 @@
       return itunesRequest.data;
     } catch (error) {
       console.log('error retrieving itunes data', error);
-      itunesError = error;
+      throw error;
     }
   }
+
+  const sortArtist = computed(() => {
+    return albums.sort((a1, a2) => a1.artist > a2.artist);
+  });
+
+  const sortTitle = computed(() => {
+    return albums.sort((a1, a2) => a1.title > a2.title);
+  });
 
   const itunesData = await getItunesData();
   const entries = itunesData.feed.entry;
 
-  const albums = entries.map(entry => {
+  let albums = entries.map(entry => {
     return { 
       id: entry.id.attributes["im:id"],
-      title: entry.title.label,
+      title: entry["im:name"].label,
       artist: entry["im:artist"].label
     }
   })
@@ -33,6 +39,14 @@
 
 <template>
   <main>
+    <div id="sort-buttons">
+      <p>Here are today's top {{ albums.length }} iTunes albums! Feel free to <i>sort</i> through them :)</p>
+      <div class="btn-group">
+        <button @click="sortArtist" type="button" class="btn btn-success btn-rounded">Sort Artist A-Z</button>
+        <button @click="sortTitle" type="button" class="btn btn-success btn-rounded">Sort Title A-Z</button>
+      </div>
+    </div>
+    <br/>
     <Album
       v-for="album in albums"
       v-bind:id="album.id"
@@ -41,3 +55,9 @@
     ></Album>
   </main>
 </template>
+
+<style scoped>
+#sort-buttons {
+  text-align: center;
+}
+</style>
