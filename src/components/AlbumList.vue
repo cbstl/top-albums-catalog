@@ -137,7 +137,7 @@
     <br/>
     <Album
       v-for="album, index in albums"
-      v-bind:id="index"
+      v-bind:id="'num-'+index"
       v-bind:title="album.title"
       v-bind:artist="album.artist"
     ></Album>
