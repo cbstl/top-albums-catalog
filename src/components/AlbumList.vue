@@ -32,11 +32,13 @@
       Album
     },
     props: {
+      albums: Array<Album>,
       searchTerm: String
     },
     async setup(props) {
       // initialize data
-      const albums = ref(await createAlbumList()) as Array<Album>;
+      const createdAlbums = await createAlbumList();
+      const albums = ref(props.albums ? props.albums : createdAlbums) as Array<Album>;
       const searchTerm = props.searchTerm;
 
       // search for artist or album
@@ -130,6 +132,7 @@
             </table>
           </div>
         </div>
+    <p>Click righthand button to search. Searching empty will revert to original list.</p>
     </div>
     <br/>
     <Album
