@@ -1,8 +1,41 @@
-<script setup lang="ts">
-  import { computed } from 'vue';
+<script lang="ts">
+  import { defineComponent, ref } from "vue";
+  import axios from 'axios';
   import Album from '../components/Album.vue';
-  import axios from 'axios'
 
+  export default defineComponent({
+    components: {
+      Album
+    },
+    async setup() {
+      // initialize list of albums to iterate over
+      const albums = ref(await createAlbumList());
+
+      // orders albums by artist alphabetically
+      const sortByArtist = function () {
+        this.albums = this.albums.sort((a1, a2) => {
+          return a1.artist < a2.artist ? -1 : 1;
+        });
+      }
+      
+      // orders albums by title alphabetically
+      const sortByTitle = function() {
+        this.albums = this.albums.sort((a1, a2) => {
+          return a1.title < a2.title ? -1 : 1;
+        })
+      }
+      
+      // reverts back to original album list from api
+      const sortByRating = function() {
+        this.albums = this.albums.sort((a1, a2) => {
+          return a1.id < a2.id ? -1 : 1;
+        })
+      }
+      return { albums, sortByArtist, sortByTitle, sortByRating }
+    }
+  })
+
+  // retrieves up to 100 top rated albums from apple itunes api
   async function getItunesData() {
     try {
       const itunesRequest = await axios.get(
@@ -15,41 +48,33 @@
     }
   }
 
-  const sortArtist = computed(() => {
-    return albums.sort((a1, a2) => a1.artist > a2.artist);
-  });
-
-  const sortTitle = computed(() => {
-    return albums.sort((a1, a2) => a1.title > a2.title);
-  });
-
-  const itunesData = await getItunesData();
-  const entries = itunesData.feed.entry;
-
-  let albums = entries.map(entry => {
-    return { 
-      id: entry.id.attributes["im:id"],
-      title: entry["im:name"].label,
-      artist: entry["im:artist"].label
-    }
-  })
-
-  console.log('albums', albums)
+  // formats album data into array for Album component
+  async function createAlbumList() {
+    const itunesData = await getItunesData();
+    const entries = itunesData.feed.entry;
+    return entries.map((entry, index) => {
+      return {
+        id: index,
+        title: entry["im:name"].label,
+        artist: entry["im:artist"].label
+      }
+    })
+  }
 </script>
 
 <template>
   <main>
     <div id="sort-buttons">
-      <p>Here are today's top {{ albums.length }} iTunes albums! Feel free to <i>sort</i> through them :)</p>
+      <p>Here are today's top 100 iTunes albums! Feel free to <i>sort</i> through them :)</p>
       <div class="btn-group">
-        <button @click="sortArtist" type="button" class="btn btn-success btn-rounded">Sort Artist A-Z</button>
-        <button @click="sortTitle" type="button" class="btn btn-success btn-rounded">Sort Title A-Z</button>
+        <button @click="sortByArtist" type="button" class="btn btn-success btn-rounded">Sort by Artist A-Z</button>
+        <button @click="sortByTitle" type="button" class="btn btn-success btn-rounded">Sort by Title A-Z</button>
+        <button @click="sortByRating" type="button" class="btn btn-success btn-rounded">Sort by Rating</button>
       </div>
     </div>
     <br/>
     <Album
       v-for="album in albums"
-      v-bind:id="album.id"
       v-bind:title="album.title"
       v-bind:artist="album.artist"
     ></Album>
