@@ -1,14 +1,19 @@
 <script setup lang="ts">
 defineProps<{
-  msg: string;
+    id: string;
+    title: string;
+    artist: string;
 }>();
 </script>
 
 <template>
-    
+    <div>
+        <p>{{ title }} by {{ artist }}</p>
+    </div>
 </template>
 
 <style scoped>
+/*
 h1 {
   font-weight: 500;
   font-size: 2.6rem;
@@ -30,4 +35,5 @@ h3 {
     text-align: left;
   }
 }
+*/
 </style>
