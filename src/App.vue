@@ -4,7 +4,7 @@ import { RouterView } from "vue-router";
 
 <template>
   <header>
-    <h1>DJ Japan Rabbit</h1>
+    <h1>Top Album Catalog</h1>
   </header>
   <br/>
   <Suspense>

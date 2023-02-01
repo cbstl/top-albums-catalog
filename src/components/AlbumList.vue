@@ -31,15 +31,12 @@
     components: {
       Album
     },
-    props: {
-      albums: Array<Album>,
-      searchTerm: String
-    },
-    async setup(props) {
+    async setup() {
       // initialize data
       const createdAlbums = await createAlbumList();
-      const albums = ref(props.albums ? props.albums : createdAlbums) as Array<Album>;
-      const searchTerm = props.searchTerm;
+      const albums = ref(createdAlbums) as Array<Album>;
+      const searchTerm = ref('');
+      const numTotalAlbums = createdAlbums.length as Number;
 
       // search for artist or album
       const searchForTerm = async function (this: AlbumListSetup, theSearchTerm: string) {
@@ -75,7 +72,7 @@
         })
       }
 
-      return { albums, searchTerm, searchForTerm, sortByArtist, sortByTitle, sortByRating }
+      return { albums, searchTerm, numTotalAlbums, searchForTerm, sortByArtist, sortByTitle, sortByRating }
     }
   })
 
@@ -109,7 +106,7 @@
 <template>
   <main>
     <div id="navigation">
-      <p>Here are today's top {{albums.length}} iTunes albums! Feel free to <i>sort</i> through them :)</p>
+      <p>Here are today's top {{numTotalAlbums}} iTunes albums! Feel free to <i>sort</i> through them :)</p>
       <div class="btn-group">
         <button @click="sortByArtist" type="button" class="btn btn-success btn-rounded">Sort by Artist A-Z</button>
         <button @click="sortByTitle" type="button" class="btn btn-success btn-rounded">Sort by Title A-Z</button>
