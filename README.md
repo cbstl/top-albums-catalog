@@ -1,4 +1,4 @@
-### Top Album Catalog
+### Top Albums Catalog
 
 This is a Vue/TypeScript single page application that retrieves up to 100 top albums from the iTunes API and lists them. Users can search the list by album or artist and, as a special feature of this coding challenge, sort by artist, title, or rating.
 
